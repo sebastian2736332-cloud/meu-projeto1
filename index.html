@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>servidor discord</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Space Grotesk', 'sans-serif'] },
+                    colors: { accent: '#a855f7' }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { background-color: #000; color: #fff; overflow: hidden; margin: 0; }
+
+        .bg-image {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: -20;
+            background-image: url("./publico/assets/fundo.gif");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.35) blur(5px); 
+            transform: scale(1.05);
+        }
+
+        .noise-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 50; opacity: 0.05;
+            background-image: url("./publico/assets/noise.png"); 
+        }
+        
+        .progress-bar { transition: width 0.1s linear; }
+        ::-webkit-scrollbar { width: 0px; }
+        
+        .copy-notification {
+            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(168, 85, 247, 0.9); padding: 8px 16px; border-radius: 8px;
+            font-size: 12px; opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100;
+        }
+
+        /* Estilo especial para a palavra discord */
+        .discord-text {
+            font-style: italic;
+            background: linear-gradient(to right, #fff, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 300;
+        }
+    </style>
+</head>
+<body class="h-screen w-screen flex items-center justify-center relative selection:bg-accent selection:text-white">
+
+    <div class="bg-image"></div>
+    <div class="noise-bg"></div>
+    <div id="copyNotice" class="copy-notification">Nome copiado!</div>
+
+    <div class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] -z-10"></div>
+
+    <main class="w-full max-w-[400px] p-4 relative z-10">
+        <div class="bg-[#0a0a0a]/80 backdrop-blur-2xl border border-white/5 rounded-3xl overflow-hidden shadow-2xl">
+            
+            <div class="h-36 w-full relative">
+                <img src="./publico/assets/banner.jpg" class="w-full h-full object-cover opacity-60">
+                <div class="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/20 to-transparent"></div>
+            </div>
+
+            <div class="px-8 pb-8 -mt-12 relative flex flex-col items-center text-center">
+                
+                <div class="w-24 h-24 rounded-full p-1 bg-[#0a0a0a] ring-1 ring-white/10 mb-4 relative">
+                    <img src="./publico/assets/avatar.gif" class="w-full h-full rounded-full object-cover">
+                    <div class="absolute bottom-1 right-1 w-4 h-4 bg-[#0a0a0a] rounded-full flex items-center justify-center">
+                        <div class="w-2.5 h-2.5 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_#22c55e]"></div>
+                    </div>
+                </div>
+
+                <h1 class="text-2xl font-bold text-white tracking-tight uppercase">servidor</h1>
+                
+                <span class="discord-text text-sm uppercase tracking-[0.4em] mt-2 block">discord</span>
+
+                <div class="mt-6">
+                    <div onclick="copyDiscord()" class="px-4 py-1.5 rounded-lg bg-white/5 border border-white/5 text-[10px] text-zinc-300 font-mono flex items-center gap-2 hover:bg-white/10 transition-all cursor-pointer group inline-flex">
+                        <i class="fab fa-discord text-accent group-hover:scale-110 transition-transform"></i> 
+                        <span id="discordUser">infinity._.8</span>
+                    </div>
+                </div>
+
+                <div class="mt-8 flex gap-6 text-zinc-500">
+                    <a href="https://discord.gg/SEU_CONVITE" target="_blank" class="hover:text-accent transition-all duration-300 text-lg hover:-translate-y-1">
+                        <i class="fab fa-discord"></i>
+                    </a>
+                    <a href="#" class="hover:text-accent transition-all duration-300 text-lg hover:-translate-y-1"><i class="fab fa-github"></i></a>
+                    <a href="#" class="hover:text-accent transition-all duration-300 text-lg hover:-translate-y-1"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="hover:text-accent transition-all duration-300 text-lg hover:-translate-y-1"><i class="fab fa-steam"></i></a>
+                </div>
+
+                <div class="w-full h-px bg-white/5 my-6"></div>
+
+                <div class="w-full bg-white/[0.03] rounded-2xl p-4 border border-white/5 flex items-center gap-4">
+                    <button id="playBtn" class="w-10 h-10 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 active:scale-95 transition-all flex-shrink-0">
+                        <i class="fas fa-play text-xs ml-0.5" id="playIcon"></i>
+                    </button>
+
+                    <div class="flex-1 text-left overflow-hidden">
+                        <div class="flex justify-between items-center mb-1.5">
+                            <span class="text-[11px] font-bold text-white truncate pr-2">Br41n R0lling</span>
+                            <span id="timer" class="text-[10px] text-zinc-500 font-mono">0:00</span>
+                        </div>
+                        <div class="w-full h-1 bg-zinc-800 rounded-full overflow-hidden cursor-pointer" id="progressContainer">
+                            <div id="progressBar" class="h-full bg-accent w-0 rounded-full progress-bar shadow-[0_0_8px_#a855f7]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <audio id="audio" src="./publico/assets/musica.mp3" loop></audio>
+
+    <script>
+        function copyDiscord() {
+            const user = document.getElementById('discordUser').innerText;
+            navigator.clipboard.writeText(user);
+            const notice = document.getElementById('copyNotice');
+            notice.style.opacity = '1';
+            setTimeout(() => { notice.style.opacity = '0'; }, 2000);
+        }
+
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const timer = document.getElementById('timer');
+
+        playBtn.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                playIcon.classList.replace('fa-play', 'fa-pause');
+                playIcon.classList.remove('ml-0.5');
+                playBtn.classList.add('bg-accent', 'text-white');
+                playBtn.classList.remove('bg-white', 'text-black');
+            } else {
+                audio.pause();
+                playIcon.classList.replace('fa-pause', 'fa-play');
+                playIcon.classList.add('ml-0.5');
+                playBtn.classList.remove('bg-accent', 'text-white');
+                playBtn.classList.add('bg-white', 'text-black');
+            }
+        });
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = percent + '%';
+                const min = Math.floor(audio.currentTime / 60);
+                const sec = Math.floor(audio.currentTime % 60);
+                timer.innerText = `${min}:${sec < 10 ? '0'+sec : sec}`;
+            }
+        });
+
+        progressContainer.addEventListener('click', (e) => {
+            const width = progressContainer.clientWidth;
+            const clickX = e.offsetX;
+            audio.currentTime = (clickX / width) * audio.duration;
+        });
+        audio.volume = 0.4;
+    </script>
+</body>
+</html>
